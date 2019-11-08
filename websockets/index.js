@@ -13,16 +13,19 @@ var io = socket(server);
 io.on('connection', function(socket){
     console.log("Made connection with " + socket.id);
 
+    socket.on('room', function(room) {
+        socket.join(room);
+    });
+
     socket.on('chat',function(data){
-        io.emit('chat', data);
+        io.in(data.room).emit('chat', data);
     });
 
     socket.on('typing',function(data){
-        socket.broadcast.emit('typing', data);
+        socket.to(data.room).emit('typing', data);
     });
 
-    socket.on('notTyping',function(){
-        console.log("oi")
-        socket.broadcast.emit('notTyping');
+    socket.on('notTyping',function(data){
+        socket.to(data.room).emit('notTyping');
     });
 });

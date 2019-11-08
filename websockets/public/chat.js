@@ -6,13 +6,18 @@ var btn = document.getElementById("send");
 var output = document.getElementById("output");
 var feedback = document.getElementById('feedback');
 
+var room = prompt("Which room would you liked to join?")
+
 btn.addEventListener('click', function(){
     socket.emit('chat',{
         message: message.value,
-        handle: handle.value
+        handle: handle.value,
+        room
     });
     message.value = ""
-    socket.emit('notTyping');
+    socket.emit('notTyping',{
+        room
+    });
 });
 
 message.addEventListener('keyup',function(event){
@@ -20,11 +25,18 @@ message.addEventListener('keyup',function(event){
         btn.click();
     } else if (message.value !== ""){
         socket.emit('typing',{
-            handle: handle.value
+            handle: handle.value,
+            room
         });
     } else {
-        socket.emit('notTyping');
+        socket.emit('notTyping',{
+            room
+        });
     }
+});
+
+socket.on('connect', function() {
+   socket.emit('room', room);
 });
 
 socket.on('chat', function(data){
